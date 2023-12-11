@@ -353,7 +353,8 @@ class ConversableAgent(Agent):
         """
         # When the agent composes and sends the message, the role of the message is "assistant"
         # unless it's "function".
-        self.ao_client.record_action("send_message_to_another_agent", tags=['conversable_agent', str(self.name())])
+        if self.ao_client:
+            self.ao_client.record_action("send_message_to_another_agent", tags=['conversable_agent', str(self.name())])
         valid = self._append_oai_message(message, "assistant", recipient)
         if valid:
             recipient.receive(message, self, request_reply, silent)
@@ -486,7 +487,8 @@ class ConversableAgent(Agent):
         Raises:
             ValueError: if the message can't be converted into a valid ChatCompletion message.
         """
-        self.ao_client.record_action("received_message_from_another_agent", tags=['conversable_agent', str(self.name())])
+        if self.ao_client:
+            self.ao_client.record_action("received_message_from_another_agent", tags=['conversable_agent', str(self.name())])
         self._process_received_message(message, sender, silent)
         if request_reply is False or request_reply is None and self.reply_at_receive[sender] is False:
             return
