@@ -17,6 +17,7 @@ ENV_VARS = {
     "OPENAI_API_KEY": "sk-********************",
     "HUGGING_FACE_API_KEY": "**************************",
     "ANOTHER_API_KEY": "1234567890234567890",
+    "AGENTOPS_API_KEY": "********-****-****-****-************"
 }
 
 # Example model to API key mappings
