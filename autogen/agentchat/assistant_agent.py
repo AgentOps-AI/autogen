@@ -1,4 +1,5 @@
 from typing import Callable, Dict, Literal, Optional, Union
+from agentops import Client as AOClient
 
 from .conversable_agent import ConversableAgent
 
@@ -39,6 +40,7 @@ Reply "TERMINATE" in the end when everything is done.
         human_input_mode: Optional[str] = "NEVER",
         code_execution_config: Optional[Union[Dict, Literal[False]]] = False,
         description: Optional[str] = None,
+        ao_client: AOClient = None,
         **kwargs,
     ):
         """
@@ -67,6 +69,7 @@ Reply "TERMINATE" in the end when everything is done.
             code_execution_config=code_execution_config,
             llm_config=llm_config,
             description=description,
+            ao_client=ao_client,
             **kwargs,
         )
 

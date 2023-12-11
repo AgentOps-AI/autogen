@@ -10,6 +10,7 @@ from autogen import OpenAIWrapper
 from autogen.code_utils import DEFAULT_MODEL, UNKNOWN, content_str, execute_code, extract_code, infer_lang
 
 from .agent import Agent
+from agentops import Client as AOClient
 
 try:
     from termcolor import colored
@@ -56,6 +57,7 @@ class ConversableAgent(Agent):
         llm_config: Optional[Union[Dict, Literal[False]]] = None,
         default_auto_reply: Optional[Union[str, Dict, None]] = "",
         description: Optional[str] = None,
+        ao_client: AOClient = None
     ):
         """
         Args:
@@ -99,6 +101,7 @@ class ConversableAgent(Agent):
             default_auto_reply (str or dict or None): default auto reply when no code execution or llm-based reply is generated.
             description (str): a short description of the agent. This description is used by other agents
                 (e.g. the GroupChatManager) to decide when to call upon this agent. (Default: system_message)
+            ao_client (AgentOps Client Instance): an instance of and AgentOps client. All agents should share one instance. (Default: None)
         """
         super().__init__(name)
         # a dictionary of conversations, default value is list
@@ -140,6 +143,7 @@ class ConversableAgent(Agent):
         self.register_reply([Agent, None], ConversableAgent.a_generate_function_call_reply)
         self.register_reply([Agent, None], ConversableAgent.check_termination_and_human_reply)
         self.register_reply([Agent, None], ConversableAgent.a_check_termination_and_human_reply)
+        self.ao_client = ao_client
 
     def register_reply(
         self,
@@ -349,6 +353,8 @@ class ConversableAgent(Agent):
         """
         # When the agent composes and sends the message, the role of the message is "assistant"
         # unless it's "function".
+        if self.ao_client:
+            self.ao_client.record_action("send_message_to_another_agent", tags=['conversable_agent', str(self.name())])
         valid = self._append_oai_message(message, "assistant", recipient)
         if valid:
             recipient.receive(message, self, request_reply, silent)
@@ -481,6 +487,8 @@ class ConversableAgent(Agent):
         Raises:
             ValueError: if the message can't be converted into a valid ChatCompletion message.
         """
+        if self.ao_client:
+            self.ao_client.record_action("received_message_from_another_agent", tags=['conversable_agent', str(self.name())])
         self._process_received_message(message, sender, silent)
         if request_reply is False or request_reply is None and self.reply_at_receive[sender] is False:
             return
