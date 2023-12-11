@@ -144,6 +144,27 @@ response = autogen.Completion.create(context=test_instance, **config)
 
 Please find more [code examples](https://microsoft.github.io/autogen/docs/Examples#tune-gpt-models) for this feature. -->
 
+## Monitoring
+Basic monitoring is demonstrated in `test/twoagent-monitored.py`
+
+Monitoring can be implemented using the AgentOps library.
+
+1. `pip install agentops`
+2. Create an account at https://agentops.ai and generate an API key
+3. `export AGENTOPS_API_KEY=<your_key>`
+4. When creating a `ConversableAgent` or `AssistantAgent`, first create an Agent Ops client instance
+    ```python
+   from agentops import Client
+   ao_client = Client(api_key=os.environ.get('AGENTOPS_API_KEY'),
+                   tags=['describe your session here'])
+   ```
+5. Pass this client instance into the constructor arguments of your Agent
+   ```python
+   assistant = AssistantAgent("assistant", llm_config={"config_list": config_list}, ao_client=ao_client)
+   ```
+6. Run your agent(s) and view the results of your session on the [AgentOps Dashboard](https://app.agentops.ai/dashboard)
+   
+
 ## Documentation
 
 You can find detailed documentation about AutoGen [here](https://microsoft.github.io/autogen/).

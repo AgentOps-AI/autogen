@@ -9,6 +9,7 @@ from autogen import OpenAIWrapper
 from autogen.code_utils import DEFAULT_MODEL, UNKNOWN, content_str, execute_code, extract_code, infer_lang
 
 from .agent import Agent
+from agentops import Client as AOClient
 
 try:
     from termcolor import colored
@@ -54,6 +55,7 @@ class ConversableAgent(Agent):
         code_execution_config: Optional[Union[Dict, Literal[False]]] = None,
         llm_config: Optional[Union[Dict, Literal[False]]] = None,
         default_auto_reply: Optional[Union[str, Dict, None]] = "",
+        ao_client: AOClient = None
     ):
         """
         Args:
@@ -134,6 +136,7 @@ class ConversableAgent(Agent):
         self.register_reply([Agent, None], ConversableAgent.generate_async_function_call_reply)
         self.register_reply([Agent, None], ConversableAgent.check_termination_and_human_reply)
         self.register_reply([Agent, None], ConversableAgent.a_check_termination_and_human_reply)
+        self.ao_client = ao_client
 
     def register_reply(
         self,
@@ -343,6 +346,7 @@ class ConversableAgent(Agent):
         """
         # When the agent composes and sends the message, the role of the message is "assistant"
         # unless it's "function".
+        self.ao_client.record_action("send_message_to_another_agent", tags=['conversable_agent', str(self.name())])
         valid = self._append_oai_message(message, "assistant", recipient)
         if valid:
             recipient.receive(message, self, request_reply, silent)
@@ -475,6 +479,7 @@ class ConversableAgent(Agent):
         Raises:
             ValueError: if the message can't be converted into a valid ChatCompletion message.
         """
+        self.ao_client.record_action("received_message_from_another_agent", tags=['conversable_agent', str(self.name())])
         self._process_received_message(message, sender, silent)
         if request_reply is False or request_reply is None and self.reply_at_receive[sender] is False:
             return
