@@ -101,6 +101,7 @@ class ConversableAgent(Agent):
             default_auto_reply (str or dict or None): default auto reply when no code execution or llm-based reply is generated.
             description (str): a short description of the agent. This description is used by other agents
                 (e.g. the GroupChatManager) to decide when to call upon this agent. (Default: system_message)
+            ao_client (AgentOps Client Instance): an instance of and AgentOps client. All agents should share one instance. (Default: None)
         """
         super().__init__(name)
         # a dictionary of conversations, default value is list
