@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[8379],{82530:t=>{t.exports=JSON.parse('{"label":"task utility","permalink":"/autogen/blog/tags/task-utility","allTagsPath":"/autogen/blog/tags","count":1,"unlisted":false}')}}]);
